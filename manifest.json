@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "id": "io.github.zachfleeman.captive",
+  "name": "Captive Portal",
+  "version": "1.0.0",
+  "author": "zachfleeman",
+  "license": "MIT",
+  "description": "Detects captive portals on public wifi networks and opens the sign-in page automatically.",
+  "kinds": [
+    "service"
+  ],
+  "entryPoints": {
+    "service": "Service.qml"
+  }
+}
