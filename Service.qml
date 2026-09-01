@@ -178,6 +178,7 @@ Item {
 
   Process { id: notifyProcess }
   Process { id: browserProcess }
+  Process { id: windowRuleProcess }
 
   IpcHandler {
     target: "captive"
@@ -200,5 +201,17 @@ Item {
     }
   }
 
-  Component.onCompleted: if (suspect) settleTimer.restart()
+  // Floats the sign-in window; its app id ends in the profile set by open-portal.sh.
+  function registerWindowRule() {
+    windowRuleProcess.command = [
+      "hyprctl", "eval",
+      'o.window(".*-omarchy-captive$", { tag = "+floating-window" })'
+    ]
+    windowRuleProcess.running = true
+  }
+
+  Component.onCompleted: {
+    registerWindowRule()
+    if (suspect) settleTimer.restart()
+  }
 }

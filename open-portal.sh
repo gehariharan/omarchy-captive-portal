@@ -35,8 +35,4 @@ fi
 
 command -v "$1" >/dev/null || { echo "no browser available to open $url" >&2; exit 1; }
 
-if [[ -n ${HYPRLAND_INSTANCE_SIGNATURE:-} ]] && command -v hyprctl >/dev/null; then
-  hyprctl eval 'o.window(".*-omarchy-captive$", { tag = "+floating-window" })' >/dev/null 2>&1
-fi
-
 setsid "$@" >/dev/null 2>&1 &
