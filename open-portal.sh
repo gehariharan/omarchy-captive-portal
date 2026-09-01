@@ -3,13 +3,17 @@
 
 url="${1:?usage: open-portal.sh <url>}"
 
-profile="${XDG_RUNTIME_DIR:-/tmp}/omarchy-captive-portal"
-rm -rf "$profile" 2>/dev/null
-mkdir -p "$profile"
+if [[ ! ${url,,} =~ ^https?://[^[:cntrl:]]+$ ]] || [[ $url == *']==]'* ]]; then
+  echo "refusing to open untrusted url: $url" >&2
+  exit 1
+fi
+
+profile="$(mktemp -d "${XDG_RUNTIME_DIR:-/tmp}/omarchy-captive-portal.XXXXXX")" || exit 1
 
 app_args=(
   --app="$url"
   --user-data-dir="$profile"
+  --profile-directory=omarchy-captive
   --incognito
   --no-first-run
   --no-default-browser-check
@@ -31,11 +35,8 @@ fi
 
 command -v "$1" >/dev/null || { echo "no browser available to open $url" >&2; exit 1; }
 
-if [[ -z ${HYPRLAND_INSTANCE_SIGNATURE:-} ]] || ! command -v hyprctl >/dev/null; then
-  setsid "$@" >/dev/null 2>&1 &
-  exit 0
+if [[ -n ${HYPRLAND_INSTANCE_SIGNATURE:-} ]] && command -v hyprctl >/dev/null; then
+  hyprctl eval 'o.window(".*-omarchy-captive$", { tag = "+floating-window" })' >/dev/null 2>&1
 fi
 
-hyprctl dispatch \
-  "hl.dsp.exec_cmd([==[$*]==], { float = true, center = true, size = [==[875 600]==] })" \
-  >/dev/null 2>&1 || setsid "$@" >/dev/null 2>&1 &
+setsid "$@" >/dev/null 2>&1 &

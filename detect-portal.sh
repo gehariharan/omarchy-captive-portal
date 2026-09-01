@@ -6,7 +6,7 @@ PROBE="${1:-http://captive.apple.com/hotspot-detect.html}"
 portal=""
 status=1
 
-response=$(curl -sS -m 5 -i \
+response=$(curl -sS -m 5 -i --max-filesize 100000 \
   -A "CaptiveNetworkSupport-355.200.27 wispr" \
   "$PROBE" 2>/dev/null)
 
