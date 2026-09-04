@@ -6,9 +6,9 @@ PROBE="${1:-http://captive.apple.com/hotspot-detect.html}"
 portal=""
 status=1
 
-response=$(curl -sS -m 5 -i --max-filesize 100000 \
+response=$(curl -sS -m 5 -i \
   -A "CaptiveNetworkSupport-355.200.27 wispr" \
-  "$PROBE" 2>/dev/null)
+  "$PROBE" 2>/dev/null | head -c 65536)
 
 if [[ -n $response ]]; then
   location=$(printf '%s' "$response" \

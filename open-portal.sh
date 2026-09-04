@@ -3,7 +3,7 @@
 
 url="${1:?usage: open-portal.sh <url>}"
 
-if [[ ! ${url,,} =~ ^https?://[^[:cntrl:]]+$ ]] || [[ $url == *']==]'* ]]; then
+if [[ ! ${url,,} =~ ^https?://[^[:cntrl:]]{1,2000}$ ]] || [[ $url == *']==]'* ]]; then
   echo "refusing to open untrusted url: $url" >&2
   exit 1
 fi
@@ -19,6 +19,12 @@ app_args=(
   --no-default-browser-check
 )
 
+gecko_args=(
+  --profile "$profile"
+  --no-remote
+  --private-window "$url"
+)
+
 if command -v chromium >/dev/null; then
   set -- chromium "${app_args[@]}"
 else
@@ -27,12 +33,13 @@ else
     brave)        set -- brave "${app_args[@]}" ;;
     brave-origin) set -- brave-origin "${app_args[@]}" ;;
     edge)         set -- microsoft-edge-stable "${app_args[@]}" ;;
-    firefox)      set -- firefox --private-window "$url" ;;
-    zen)          set -- zen-browser --private-window "$url" ;;
+    firefox)      set -- firefox "${gecko_args[@]}" ;;
+    zen)          set -- zen-browser "${gecko_args[@]}" ;;
     *)            set -- xdg-open "$url" ;;
   esac
 fi
 
 command -v "$1" >/dev/null || { echo "no browser available to open $url" >&2; exit 1; }
 
-setsid "$@" >/dev/null 2>&1 &
+# Removes the throwaway profile once the sign-in window closes.
+{ setsid --wait "$@"; rm -rf "$profile"; } >/dev/null 2>&1 &

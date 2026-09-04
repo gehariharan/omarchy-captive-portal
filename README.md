@@ -39,7 +39,9 @@ intercepting DNS, so a pinned public resolver can stop that from working.
 
 - Requests `http://captive.apple.com/hotspot-detect.html` when connectivity is
   not full, to detect interception and read the sign-in URL
-- Launches a centered sign-in browser window using a temporary profile
+- Launches a centered sign-in browser window in a throwaway profile under
+  `$XDG_RUNTIME_DIR`, removed when the window closes. Browsers it does not
+  recognize are opened with `xdg-open`, which uses your normal session
 - Sends desktop notifications through `notify-send`
 
 It requires no elevated privileges, installs no services, and writes nothing
